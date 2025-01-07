@@ -15,36 +15,53 @@ fn extract_errors(text: &str) -> Vec<String> {
     results
 }
 
-fn main() {
-    match fs::read_to_string("logs.txt") {
-        Ok(text) => {
-            let error_logs = extract_errors(text.as_str());
+fn main() -> Result<(), Error> {
+    // Ways to replace nested match statements
+    // 1 - using "expect"
+    let text = fs::read_to_string("logs.txt").expect("Failed to read logs.txt");
+    
+    let error_logs = extract_errors(text.as_str());
+    
+    fs::write("errors.txt", error_logs.join("\n")).expect("Failed to write to errors.txt");
 
-            match fs::write("errors.txt", error_logs.join("\n")) {
-                Ok(..) => println!("Wrote errors.txt"),
-                Err(error) => {
-                    println!("Writing of errors.txt failed: {}", error);
-                }
-            }
-        },
-        Err(error) => println!("Failed to read file: {}", error),
-    }
+    // 2 - using "?" (Try) operator
+    let text2 = fs::read_to_string("logs.txt")?;
 
-    match divide(5.0, 0.0) {
-        Ok(result_of_division) => {
-            println!("{}", result_of_division);
-        }
-        Err(what_went_wrong) => {
-            println!("{}", what_went_wrong);
-        }
-    }
+    let error_logs2  = extract_errors(text2.as_str());
+    
+    fs::write("errors.txt", error_logs2.join("\n"))?;
+    
+    Ok(())
 
-    match validate_email(String::from("willy@meta.com")) {
-        Ok(..) => println!("Email is valid"),
-        Err(why_it_failed) => {
-            println!("{}", why_it_failed)
-        }
-    }
+    // match fs::read_to_string("logs.txt") {
+    //     Ok(text) => {
+    //         let error_logs = extract_errors(text.as_str());
+
+    //         match fs::write("errors.txt", error_logs.join("\n")) {
+    //             Ok(..) => println!("Wrote errors.txt"),
+    //             Err(error) => {
+    //                 println!("Writing of errors.txt failed: {}", error);
+    //             }
+    //         }
+    //     }
+    //     Err(error) => println!("Failed to read file: {}", error),
+    // }
+
+    // match divide(5.0, 0.0) {
+    //     Ok(result_of_division) => {
+    //         println!("{}", result_of_division);
+    //     }
+    //     Err(what_went_wrong) => {
+    //         println!("{}", what_went_wrong);
+    //     }
+    // }
+
+    // match validate_email(String::from("willy@meta.com")) {
+    //     Ok(..) => println!("Email is valid"),
+    //     Err(why_it_failed) => {
+    //         println!("{}", why_it_failed);
+    //     }
+    // }
 }
 
 fn divide(a: f64, b: f64) -> Result<f64, Error> {
